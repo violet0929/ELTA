@@ -2,15 +2,6 @@
 
 Exclusive Link Traffic Allocation in IEEE 802.11be Asynchronous Multi Link Operation
 
-* [Overview](#overview)
-  * [Introduction](#introduction)
-  * [Problem Formulation](#problem_formulation)
-  * [ELTA](#elta)
-  * [Evaluation](#evaluation)
-  * [References](#references)
-* [Running](#running)
-  * [Packages](#package)
-
 ## Overview
 
 ### Introduction
@@ -103,8 +94,6 @@ Reducing Channel Access Delay for RTA Traffic, document IEEE 802.11-
   * IFIP Networking Conference, 2024
   
 * [29] "IEEE Standard for Information technology—Telecommunications and information exchange between systems Local and metropolitan area networks—Specific requirements - Part 11: Wireless LAN Medium Access Control (MAC) and Physical Layer (PHY) Specifications," in IEEE Std 802.11-2016 (Revision of IEEE Std 802.11-2012) , vol., no., pp.1-3534, 14 Dec. 2016, doi: 10.1109/IEEESTD.2016.7786995.
-
-
 
 ## Running
 
