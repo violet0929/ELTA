@@ -689,8 +689,10 @@ WifiMac::ConfigureDcf(Ptr<Txop> dcf,
     switch (ac)
     {
     case AC_VO:
-        /*cwMinValue = (cwmin + 1) / 4 - 1;
-        cwMaxValue = (cwmin + 1) / 2 - 1;*/
+        /*
+        cwMinValue = (cwmin + 1) / 4 - 1;
+        cwMaxValue = (cwmin + 1) / 2 - 1;
+        */
         cwMinValue = 3;
         cwMaxValue = 7;
         aifsnValue = 2;
@@ -698,8 +700,10 @@ WifiMac::ConfigureDcf(Ptr<Txop> dcf,
         txopLimitNoDsss = MicroSeconds(2080);
         break;
     case AC_VI:
-        /*cwMinValue = (cwmin + 1) / 2 - 1;
-        cwMaxValue = cwmin;*/
+        /*
+        cwMinValue = (cwmin + 1) / 2 - 1;
+        cwMaxValue = cwmin;
+        */
         cwMinValue = 7;
         cwMaxValue = 15;
         aifsnValue = 3;
