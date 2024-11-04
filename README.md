@@ -110,8 +110,7 @@ Reducing Channel Access Delay for RTA Traffic, document IEEE 802.11-
 
 ### Run
 
-'''
-
+```
 ./ns3 run ELTA-simulator
+```
 
-'''
