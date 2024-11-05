@@ -47,7 +47,7 @@ Exclusive Link Traffic Allocation in IEEE 802.11be Asynchronous Multi Link Opera
   <img src="https://github.com/user-attachments/assets/4ff2a9d9-dca6-4c65-a3cb-c5377392f4f2" width="100%">
 </p>
 
-### ELTA (Exclusive Link Traffic Allocation)
+### ELTA
 * Algorithm 1: Probabilistic-based for Implicit Priority Separation
 ```c
 Function ImplicitPrioritySeparation():
