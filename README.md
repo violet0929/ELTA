@@ -28,7 +28,7 @@ Exclusive Link Traffic Allocation in IEEE 802.11be Asynchronous Multi Link Opera
 
 ### Problem Formulation
 <p align="center">  
-  <img src="https://github.com/user-attachments/assets/182e5b9d-3eaa-458d-9596-9a89b1a34461" width="100%">
+  <img src="https://github.com/user-attachments/assets/bca15c91-e234-4867-baca-ceaa5ae37809" width="100%">
 </p>
 
 <p align="center">  
@@ -40,7 +40,7 @@ Exclusive Link Traffic Allocation in IEEE 802.11be Asynchronous Multi Link Opera
 </p>
 
 <p align="center">  
-  <img src="https://github.com/user-attachments/assets/aeaae04a-f305-4898-a404-669cabc764ea">
+  <img src="https://github.com/user-attachments/assets/4ff2a9d9-dca6-4c65-a3cb-c5377392f4f2" width="100%">
 </p>
 
 
