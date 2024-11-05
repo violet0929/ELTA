@@ -6,7 +6,7 @@ Exclusive Link Traffic Allocation in IEEE 802.11be Asynchronous Multi Link Opera
 
 * [Overview](#overview)
   * [Introduction](#introduction)
-  * [Problem Formulation](#problem formulation)
+  * [Problem Formulation](#problem-formulation)
   * [ELTA](#elta)
   * [Evaluation](#evluation)
   * [References](#references)
