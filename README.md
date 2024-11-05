@@ -2,12 +2,15 @@
 
 Exclusive Link Traffic Allocation in IEEE 802.11be Asynchronous Multi Link Operation
 
+### Table of Contents
+
 * [Overview](#overview)
   * [Introduction](#introduction)
   * [Problem Formulation](#problem formulation)
   * [ELTA](#elta)
   * [Evaluation](#evluation)
   * [References](#references)
+  * [Supplementary](#supplementary)
 * [Running](#running)
   * [Packages](#package)
 
@@ -15,7 +18,31 @@ Exclusive Link Traffic Allocation in IEEE 802.11be Asynchronous Multi Link Opera
 
 ### Introduction
 
+* In theory, **the convergence of asynchronous multi-link operation and EDCA technology** not only provides enhanced QoS through efficient utilization of multiple links, but also increases transmission efficiency such as high throughput and low latency based on increased channel bandwidth capacity.
+* Nevertheless, due to the inherent characteristics of wireless communications such as interference between multiple transmitters and receivers and signal attenuation due to obstacles, **retransmission may occur, which naturally increases the worst-case latency** (i.e., This situation is particularly detrimental to the performance of high-priority traffic).
+* In this project, we propose an exclusive link-based traffic allocation mechanism using a probabilistic implicit priority separation algorithm, named **ELTA**, applicable in a practical multi-link operation environment **to solve the worst-case latency problem of high priority traffic** (i.e., AC_VO, AC_VI traffic).
+* Here is a brief summary of this project.
+  * A scenario-based analysis is performed **to find out why high latency for traffic corresponding to the high priority AC in an asynchronous multi-link operation-based EDCA environment**. In most cases, the measured high delays is obviously caused by high transmission delays due to the loss of transmitted frames. Scenario analysis is performed including the frame exchange process over time and the state of the transmitter's MPDU buffer.
+  * Next, based on **some modifications to the ns-3 wifi module**, a **probability-based implicit priority separation algorithm** to resolve the ambiguity between the theoretical and the practical high priority AC, and an **exclusive link-based traffic allocation mechanism** to ensure primary transmission of high priority traffic described in detail based on pseudo code algorithms and flow chart.
+  * Finally, we evaluate the proposed traffic allocation mechanism **in terms of 95 and 99 percentile tail latency and worst case latency** derived from the coexistence of AC traffic based on various network environments classified as sufficient and insufficient network environments.
+
 ### Problem Formulation
+
+![image-20241105115514317](C:\Users\USER\AppData\Roaming\Typora\typora-user-images\image-20241105115514317.png)
+
+
+
+![image-20241105115529467](C:\Users\USER\AppData\Roaming\Typora\typora-user-images\image-20241105115529467.png)
+
+
+
+![image-20241105115553616](C:\Users\USER\AppData\Roaming\Typora\typora-user-images\image-20241105115553616.png)
+
+
+
+![image-20241105115612565](C:\Users\USER\AppData\Roaming\Typora\typora-user-images\image-20241105115612565.png)
+
+
 
 ### ELTA
 
@@ -104,7 +131,14 @@ Reducing Channel Access Delay for RTA Traffic, document IEEE 802.11-
   
 * [29] "IEEE Standard for Information technology—Telecommunications and information exchange between systems Local and metropolitan area networks—Specific requirements - Part 11: Wireless LAN Medium Access Control (MAC) and Physical Layer (PHY) Specifications," in IEEE Std 802.11-2016 (Revision of IEEE Std 802.11-2012) , vol., no., pp.1-3534, 14 Dec. 2016, doi: 10.1109/IEEESTD.2016.7786995.
 
+### Supplementary
 
+* ns-3 Code Analysis
+  * A. AC_BE Retransmission
+  * B. AC_VI Retransmission
+  * C. Block Ack communication
+  * D. MAC layer Buffer (i.e., MPDU Buffer)
+  * E. Performance (e.g., Throughput, Latency, etc.)
 
 ## Running
 
