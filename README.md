@@ -32,22 +32,87 @@ Exclusive Link Traffic Allocation in IEEE 802.11be Asynchronous Multi Link Opera
   <img src="https://github.com/user-attachments/assets/bca15c91-e234-4867-baca-ceaa5ae37809" width="100%">
 </p>
 
+* MPDU Buffer Status #1
 <p align="center">  
   <img src="https://github.com/user-attachments/assets/f465a5f7-5f94-45d4-af94-5c98e23d53ad">
 </p>
 
+* MPDU Buffer Status #2
 <p align="center">  
   <img src="https://github.com/user-attachments/assets/10b3f977-fff5-47c4-92ca-ea7bbe9fa1ec">
 </p>
 
-* Frame Exchange process #1
+* Frame Exchange process #2
 <p align="center">  
   <img src="https://github.com/user-attachments/assets/4ff2a9d9-dca6-4c65-a3cb-c5377392f4f2" width="100%">
 </p>
 
-
 ### ELTA
+```c
+Function ImplicitPrioritySeparation():
+    /* Initialize */
+    std::vector<std::string> acVector = {"AC_VO", "AC_VI", "AC_BE", "AC_VK"};
+    std::vector<std::queue> qVector(4);
+    std::vector<std::double> pVector(4);
 
+    for i from 0 to length(qVector) - 1 do
+        /* Push the WifiMacQueue of each AC to qVector */        
+        qVector[i].push(m_mac->GetTxopQueue(acList[i]));
+         /* Allocate EDCA parameter value if WifiMacQueue is not empty */    
+        if qVector[i]->GetNPackets() > 0 then
+            aifsn = acVector[i]->GetAifsn();      
+            cwMin = acVector[i]->GetCwMin();      
+            cwMax = acVector[i]->GetCwMax();      
+            avgWaitingTime = aifsn + (cwMin + cwMax) / 2;      
+            probability = 1 / avgWaitingTime;    
+        else then
+            probability = 0;    
+        end if
+        /* Push the probability to pVector */       
+        pVector[i].push(probability);    
+        totalProbability += probability; 
+    end for
+    /* Calculate Occupancy and Probability for AC_VO and AC_VI */ 
+    q_VO = queueVector[0].m_nBytes / queueVector[0].m_maxSize;  
+    q_VI = queueVector[1].m_nBytes / queueVector[1].m_maxSize;
+    p_VO = pVector[0] / totalProbability;
+    p_VI = pVector[1] / totalProbability;
+    /* Allocate exclusive_AC */
+    if (q_VI/q_VO) >= (p_VI/p_VO) then
+        exclusive_AC = AC_VI;  
+    else then
+        exclusive_AC = AC_VO;
+    end if
+    return exclusive_AC;
+```
+
+
+```c
+Function ExclusiveLinkHandler(eventType):
+    /* Initialize */
+    std::string exclusive_AC;
+    std::vector<std::int> stateExclusiveLinkVector(nLinks); 
+
+    if eventType == AckTimeout or eventType == BlockAckTimeout then
+        /* Timeout event is triggered, invoke ImplicitPrioritySeparation */
+        exclusive_AC = ImplicitPrioritySeparation();
+        if psdu->GetAccessCategory() == exclusive_AC:
+            /* Activate exclusive link for the link to which the psdu that has timeout occurred is transmitted */
+            stateExclusiveLinkVector[m_linkId] =  1;
+        end if
+    else if eventType == StartFrameExchange then
+        if stateExclusiveLinkVector[m_linkId] == 1 and edca->AccessCategory() == exclusive_AC
+           and !GetBar(edca->AccessCategory()) and !GetRetryMpdu(edca->AccessCategory()) then
+            /* Deactivate exclusive link for the link that satisfies the following conditions 
+                Condition 1: Current link state is an active exclusive link
+                Condition 2: AC of the obtained TXOP is the same as exclusive_AC
+                Condition 3: There is no BlockAckRequest frame in the AC Queue of the obtained TXOP
+                Condition 4: There is no retransmission frame in the AC Queue of the obtained TXOP  */      
+            stateExclusiveLinkVector[m_linkId] =  0;
+         end if
+     end if  
+  return;
+```
 ### Evaluation
 
 ### References
