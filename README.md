@@ -27,22 +27,13 @@ Exclusive Link Traffic Allocation in IEEE 802.11be Asynchronous Multi Link Opera
   * Finally, we evaluate the proposed traffic allocation mechanism **in terms of 95 and 99 percentile tail latency and worst case latency** derived from the coexistence of AC traffic based on various network environments classified as sufficient and insufficient network environments.
 
 ### Problem Formulation
+![image](https://github.com/user-attachments/assets/182e5b9d-3eaa-458d-9596-9a89b1a34461)
 
-![image-20241105115514317](C:\Users\USER\AppData\Roaming\Typora\typora-user-images\image-20241105115514317.png)
+![image](https://github.com/user-attachments/assets/f465a5f7-5f94-45d4-af94-5c98e23d53ad)
 
+![image](https://github.com/user-attachments/assets/10b3f977-fff5-47c4-92ca-ea7bbe9fa1ec)
 
-
-![image-20241105115529467](C:\Users\USER\AppData\Roaming\Typora\typora-user-images\image-20241105115529467.png)
-
-
-
-![image-20241105115553616](C:\Users\USER\AppData\Roaming\Typora\typora-user-images\image-20241105115553616.png)
-
-
-
-![image-20241105115612565](C:\Users\USER\AppData\Roaming\Typora\typora-user-images\image-20241105115612565.png)
-
-
+![image](https://github.com/user-attachments/assets/aeaae04a-f305-4898-a404-669cabc764ea)
 
 ### ELTA
 
@@ -103,11 +94,12 @@ Reduction, document IEEE 802.11-20/0005r0, Jan. 2020.
 
 * [19] M. Abouelseoud, K. Sakoda, L. Xin, A. Kishida, K. Nagata, and S. Kim,
 Reducing Channel Access Delay for RTA Traffic, document IEEE 802.11-
-19/1960r1, Nov. 2019.
+19/1960r1, Nov. 2019
 
 * [20] G. Smith, 802.11mc TXOP Limits, document IEEE 802.11-13/0014r0,2013.
 
-* [21] Liu, Wen-Jiunn, Chao-Hua Huang, and Kai-Ten Feng. "Performance analysis of block acknowledgement mechanisms for next generation wireless networks." 2010 IEEE Wireless Communication and Networking Conference. IEEE, 2010.
+* [21] Performance analysis of block acknowledgement mechanisms for next generation wireless networks.
+  * 2010 IEEE Wireless Communication and Networking Conference, 2010.
   
 * [22] Multi-link operation with enhanced synchronous channel access in IEEE 802.11 be wireless LANs: Coexistence issue and solutions
   * Sensors, 2021
@@ -115,7 +107,8 @@ Reducing Channel Access Delay for RTA Traffic, document IEEE 802.11-
 * [23] Multilink operation in IEEE 802.11 be wireless LANs: Backoff overflow problem and solutions
   * Sensors, 2022
 
-* [24] López-Raventós, Alvaro, and Boris Bellalta. "Multi-link operation in IEEE 802.11 be WLANs." IEEE Wireless Communications 29.4 (2022): 94-100.
+* [24] Multi-link operation in IEEE 802.11 be WLANs
+  * IEEE Wireless Communications, 2022
 
 * [25] IEEE 802.11 be multi-link operation: When the best could be to use only a single interface
   * MedComNet, 2021
