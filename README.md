@@ -27,6 +27,7 @@ Exclusive Link Traffic Allocation in IEEE 802.11be Asynchronous Multi Link Opera
   * Finally, we evaluate the proposed traffic allocation mechanism **in terms of 95 and 99 percentile tail latency and worst case latency** derived from the coexistence of AC traffic based on various network environments classified as sufficient and insufficient network environments.
 
 ### Problem Formulation
+* Frame Exchange process #1
 <p align="center">  
   <img src="https://github.com/user-attachments/assets/bca15c91-e234-4867-baca-ceaa5ae37809" width="100%">
 </p>
@@ -39,6 +40,7 @@ Exclusive Link Traffic Allocation in IEEE 802.11be Asynchronous Multi Link Opera
   <img src="https://github.com/user-attachments/assets/10b3f977-fff5-47c4-92ca-ea7bbe9fa1ec">
 </p>
 
+* Frame Exchange process #1
 <p align="center">  
   <img src="https://github.com/user-attachments/assets/4ff2a9d9-dca6-4c65-a3cb-c5377392f4f2" width="100%">
 </p>
