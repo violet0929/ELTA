@@ -6,7 +6,7 @@
     
   ![image](https://www.nsnam.org/docs/release/3.40/models/singlehtml/_images/WifiArchitecture.png)
 
-### Appendix
+### List of Contents
 * A. AC_BE Retransmission
 * B. AC_VI Retransmission
 * C. Block Ack communication
