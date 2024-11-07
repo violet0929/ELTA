@@ -223,6 +223,9 @@ Reducing Channel Access Delay for RTA Traffic, document IEEE 802.11-
 
 
 ### Run
+수정 부분 아오 좀 그만 까먹어라
+ns3::WifiMac (151-186)
+ns3::WifiMac::ConfigureDcf (688-723)
 
 ```
 ./ns3 run ELTA-simulator
