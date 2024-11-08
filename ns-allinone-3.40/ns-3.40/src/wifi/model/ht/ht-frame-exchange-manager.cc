@@ -22,6 +22,8 @@
 #include "ns3/abort.h"
 #include "ns3/assert.h"
 #include "ns3/ctrl-headers.h"
+#include "ns3/elta-handler.h"
+#include "ns3/elta-tracer.h"
 #include "ns3/log.h"
 #include "ns3/mgt-headers.h"
 #include "ns3/recipient-block-ack-agreement.h"
@@ -29,8 +31,6 @@
 #include "ns3/sta-wifi-mac.h"
 #include "ns3/wifi-mac-queue.h"
 #include "ns3/wifi-utils.h"
-#include "ns3/elta-handler.h"
-#include "ns3/elta-tracer.h"
 
 #include <array>
 #include <optional>
@@ -359,24 +359,6 @@ HtFrameExchangeManager::StartFrameExchange(Ptr<QosTxop> edca, Time availableTime
 {
     NS_LOG_FUNCTION(this << edca << availableTime << initialFrame);
 
-    /* ELTA */
-
-    EltaHandler eltaHandler;
-
-    if (edca->GetWifiMacQueue()->GetNBytes() > 1400 and
-        eltaHandler.IsActivateExclusiveLink(m_self, m_linkId))
-    {
-        if(edca->GetAccessCategory() != eltaHandler.GetExclusiveAccessCategory()){
-            NS_LOG_UNCOND("Block Transmission");
-            return true;
-        }
-        else{
-            eltaHandler.TryDeActivateExclusiveLink(m_self, m_linkId, edca->GetAccessCategory());
-        }
-    }
-
-    /* ELTA */
-
     // First, check if there is a BAR to be transmitted
     if (auto mpdu = GetBar(edca->GetAccessCategory());
         mpdu && SendMpduFromBaManager(mpdu, availableTime, initialFrame))
@@ -394,6 +376,34 @@ HtFrameExchangeManager::StartFrameExchange(Ptr<QosTxop> edca, Time availableTime
         NS_LOG_DEBUG("No frames available for transmission");
         return false;
     }
+
+    /* ELTA */
+    EltaHandler eltaHandler;
+
+    if (edca->GetWifiMacQueue()->GetNBytes() > 1400 and
+        eltaHandler.IsActivateExclusiveLink(m_self, m_linkId))
+    {
+        if (edca->GetAccessCategory() != eltaHandler.GetExclusiveAccessCategory(m_self, m_linkId))
+        {
+            NS_LOG_DEBUG(
+                "Exclusive link is only enabled for frames with exclusive AC, Terminate TXOP");
+            return false;
+        }
+        else
+        {
+            if (!peekedItem->GetHeader().IsRetry())
+            {
+                NS_LOG_UNCOND("Deactivate: " << m_self << (int)m_linkId << (int)peekedItem->GetHeader().GetQosTid());
+                eltaHandler.DeActivateExclusiveLink(m_self, m_linkId, edca->GetAccessCategory());
+            }
+            else
+            {
+                NS_LOG_DEBUG("We are not disabling the exclusive state due to send a "
+                             "retransmission packet on the obtained exclusive AC TXOP.");
+            }
+        }
+    }
+    /* ELTA */
 
     const WifiMacHeader& hdr = peekedItem->GetHeader();
     // setup a Block Ack agreement if needed
@@ -1161,38 +1171,60 @@ HtFrameExchangeManager::ForwardPsduDown(Ptr<const WifiPsdu> psdu, WifiTxVector& 
     /* ELTA */
     EltaTracer eltaTracer;
     auto ptr = psdu->begin();
-    for (int i = 0; i < (int) psdu->GetNMpdus(); i++) {
+    for (int i = 0; i < (int)psdu->GetNMpdus(); i++)
+    {
         auto mpdu_header = ptr[i]->GetHeader();
-        if(mpdu_header.IsQosData()){
-            eltaTracer.SendQosData(Simulator::Now().As(Time::S), m_self, m_linkId, mpdu_header.GetAddr2(),
+        if (mpdu_header.IsQosData())
+        {
+            eltaTracer.SendQosData(Simulator::Now().As(Time::S),
+                                   m_self,
+                                   m_linkId,
+                                   mpdu_header.GetAddr2(),
+                                   mpdu_header.GetAddr1(),
+                                   ptr[i]->GetSize(),
+                                   ptr[i]->GetHeader().GetSequenceNumber(),
+                                   ptr[i]->GetHeader().GetQosTid(),
+                                   ptr[i]->GetHeader().IsRetry());
+        }
+        else if (mpdu_header.IsAck() && !mpdu_header.GetDuration().IsZero())
+        {
+            eltaTracer.SendNormalAck(Simulator::Now().As(Time::S),
+                                     m_self,
+                                     m_linkId,
+                                     mpdu_header.GetAddr2(),
                                      mpdu_header.GetAddr1(),
                                      ptr[i]->GetSize(),
-                                     ptr[i]->GetHeader().GetSequenceNumber(), ptr[i]->GetHeader().GetQosTid(),
                                      ptr[i]->GetHeader().IsRetry());
         }
-        else if(mpdu_header.IsAck() && !mpdu_header.GetDuration().IsZero()){
-            eltaTracer.SendNormalAck(Simulator::Now().As(Time::S), m_self, m_linkId, mpdu_header.GetAddr2(),
+        else if (mpdu_header.IsBlockAck())
+        {
+            eltaTracer.SendBlockAck(Simulator::Now().As(Time::S),
+                                    m_self,
+                                    m_linkId,
+                                    mpdu_header.GetAddr2(),
+                                    mpdu_header.GetAddr1(),
+                                    ptr[i]->GetSize(),
+                                    ptr[i]->GetHeader().IsRetry());
+        }
+        else if (mpdu_header.IsBlockAckReq())
+        {
+            eltaTracer.SendBlockAckReq(Simulator::Now().As(Time::S),
+                                       m_self,
+                                       m_linkId,
+                                       mpdu_header.GetAddr2(),
                                        mpdu_header.GetAddr1(),
                                        ptr[i]->GetSize(),
                                        ptr[i]->GetHeader().IsRetry());
         }
-        else if(mpdu_header.IsBlockAck()){
-            eltaTracer.SendBlockAck(Simulator::Now().As(Time::S), m_self, m_linkId, mpdu_header.GetAddr2(),
-                                      mpdu_header.GetAddr1(),
-                                      ptr[i]->GetSize(),
-                                      ptr[i]->GetHeader().IsRetry());
-        }
-        else if(mpdu_header.IsBlockAckReq()){
-            eltaTracer.SendBlockAckReq(Simulator::Now().As(Time::S), m_self, m_linkId, mpdu_header.GetAddr2(),
-                                         mpdu_header.GetAddr1(),
-                                         ptr[i]->GetSize(),
-                                         ptr[i]->GetHeader().IsRetry());
-        }
-        else{
-            eltaTracer.SendOther(Simulator::Now().As(Time::S), m_self, m_linkId, mpdu_header.GetAddr2(),
-                                   mpdu_header.GetAddr1(),
-                                   ptr[i]->GetSize(),
-                                   ptr[i]->GetHeader().IsRetry());
+        else
+        {
+            eltaTracer.SendOther(Simulator::Now().As(Time::S),
+                                 m_self,
+                                 m_linkId,
+                                 mpdu_header.GetAddr2(),
+                                 mpdu_header.GetAddr1(),
+                                 ptr[i]->GetSize(),
+                                 ptr[i]->GetHeader().IsRetry());
         }
     }
     /* ELTA */
@@ -1396,9 +1428,40 @@ HtFrameExchangeManager::BlockAckTimeout(Ptr<WifiPsdu> psdu, const WifiTxVector& 
 
     /* ELTA */
     EltaHandler eltaHandler;
-    if (psdu->GetNMpdus() > 1)
+    if (psdu->GetNMpdus() > 1 and !eltaHandler.IsActivateExclusiveLink(m_self, m_linkId))
     {
-        eltaHandler.ActivateExclusiveLink(m_self, m_linkId, psdu->GetHeader(0).GetQosTid());
+        std::vector<double> qVector;
+        std::vector<double> pVector;
+        for (AcIndex acIndex : {AC_VO, AC_VI, AC_BE, AC_BK})
+        {
+            double probability = 0;
+            double totalProbability = 0;
+            if ((int)m_mac->GetQosTxop(acIndex)->GetWifiMacQueue()->GetCurrentSize().GetValue())
+            {
+                double occupancy =
+                    static_cast<double>(m_mac->GetQosTxop(acIndex)->GetWifiMacQueue()->GetCurrentSize().GetValue()) /
+                    static_cast<double>(m_mac->GetQosTxop(acIndex)->GetWifiMacQueue()->GetMaxSize().GetValue());
+                        qVector.push_back(occupancy);
+                double avgWaitingTime = m_mac->GetQosTxop(acIndex)->GetAifsn(m_linkId) +
+                                        (m_mac->GetQosTxop(acIndex)->GetMinCw(m_linkId) +
+                                         m_mac->GetQosTxop(acIndex)->GetMaxCw(m_linkId)) /
+                                            2;
+                probability = 1 / avgWaitingTime;
+            }
+            else
+            {
+                qVector.push_back(0);
+                probability = 0;
+            }
+            totalProbability += probability;
+            pVector.push_back(totalProbability);
+        }
+        AcIndex acIndex = eltaHandler.ImplicitPrioritySeparation(m_self, m_linkId, qVector, pVector);
+        if(acIndex == QosUtilsMapTidToAc(psdu->GetHeader(0).GetQosTid())){
+            NS_LOG_UNCOND("Activate: " << m_self << (int)m_linkId << (int)psdu->GetHeader(0).GetQosTid());
+            eltaHandler.ActivateExclusiveLink(m_self, m_linkId, psdu->GetHeader(0).GetQosTid());
+        }
+
     }
     /* ELTA */
     GetWifiRemoteStationManager()->ReportDataFailed(*psdu->begin());

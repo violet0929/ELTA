@@ -71,29 +71,35 @@ main()
     phy.SetPcapDataLinkType(WifiPhyHelper::DLT_IEEE802_11_RADIO);
     phy.SetChannel(spectrumChannel);
 
-    phy.Set((uint8_t)0, "ChannelSettings", StringValue("{0, 20, BAND_2_4GHZ, 0}"));
+    Config::Set("/NodeList/*/DeviceList/*/$ns3::WifiNetDevice/HeConfiguration/GuardInterval",
+                TimeValue(NanoSeconds(gi)));
+
+    Config::Set("/NodeList/*/DeviceList/*/$ns3::WifiNetDevice/HeConfiguration/MpduBufferSize",
+                UintegerValue(256));
+
+    /*phy.Set((uint8_t)0, "ChannelSettings", StringValue("{0, 20, BAND_2_4GHZ, 0}"));
     wifi.SetRemoteStationManager((uint8_t)0,
                                  "ns3::ConstantRateWifiManager",
                                  "DataMode",
                                  StringValue("EhtMcs7"),
                                  "ControlMode",
-                                 StringValue("ErpOfdmRate24Mbps"));
+                                 StringValue("ErpOfdmRate24Mbps"));*/
 
-    phy.Set((uint8_t)1, "ChannelSettings", StringValue("{0, 20, BAND_5GHZ, 0}"));
-    wifi.SetRemoteStationManager((uint8_t)1,
+    phy.Set((uint8_t)0, "ChannelSettings", StringValue("{0, 80, BAND_5GHZ, 0}"));
+    wifi.SetRemoteStationManager((uint8_t)0,
                                  "ns3::ConstantRateWifiManager",
                                  "DataMode",
                                  StringValue("EhtMcs7"),
                                  "ControlMode",
                                  StringValue("OfdmRate24Mbps"));
 
-    /*phy.Set((uint8_t)1, "ChannelSettings", StringValue("{0, 80, BAND_6GHZ, 0}"));
+    phy.Set((uint8_t)1, "ChannelSettings", StringValue("{0, 80, BAND_6GHZ, 0}"));
     wifi.SetRemoteStationManager((uint8_t)1,
                                  "ns3::ConstantRateWifiManager",
                                  "DataMode",
                                  StringValue("EhtMcs7"),
                                  "ControlMode",
-                                 StringValue("EhtMcs7"));*/
+                                 StringValue("EhtMcs7"));
 
     mac.SetType("ns3::StaWifiMac",
                 "Ssid",
@@ -104,12 +110,6 @@ main()
     be_staDevices = wifi.Install(phy, mac, be_wifiStaNodes);
     mac.SetType("ns3::ApWifiMac", "Ssid", SsidValue(ssid));
     apDevice = wifi.Install(phy, mac, wifiApNode);
-
-    Config::Set("/NodeList/*/DeviceList/*/$ns3::WifiNetDevice/HeConfiguration/GuardInterval",
-                TimeValue(NanoSeconds(gi)));
-
-    Config::Set("/NodeList/*/DeviceList/*/$ns3::WifiNetDevice/HeConfiguration/MpduBufferSize",
-                UintegerValue(64));
 
     MobilityHelper mobility;
     Ptr<ListPositionAllocator> positionAlloc = CreateObject<ListPositionAllocator>();
@@ -167,7 +167,7 @@ main()
         OnOffHelper be_client1("ns3::UdpSocketFactory", dest);
         be_client1.SetAttribute("OnTime", StringValue("ns3::ConstantRandomVariable[Constant=1]"));
         be_client1.SetAttribute("OffTime", StringValue("ns3::ConstantRandomVariable[Constant=0]"));
-        be_client1.SetAttribute("DataRate", StringValue("50Mb/s"));
+        be_client1.SetAttribute("DataRate", StringValue("150Mb/s"));
         be_client1.SetAttribute("PacketSize", UintegerValue(payloadSize));
         clientApp1 = be_client1.Install(be_wifiStaNodes.Get(i));
         clientApp1.Start(Seconds(1.0));
@@ -182,7 +182,7 @@ main()
         OnOffHelper be_client2("ns3::UdpSocketFactory", dest);
         be_client2.SetAttribute("OnTime", StringValue("ns3::ConstantRandomVariable[Constant=1]"));
         be_client2.SetAttribute("OffTime", StringValue("ns3::ConstantRandomVariable[Constant=0]"));
-        be_client2.SetAttribute("DataRate", StringValue("20Mb/s"));
+        be_client2.SetAttribute("DataRate", StringValue("30Mb/s"));
         be_client2.SetAttribute("PacketSize", UintegerValue(payloadSize));
         clientApp2 = be_client2.Install(be_wifiStaNodes.Get(i));
         clientApp2.Start(Seconds(1.0));
