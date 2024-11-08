@@ -223,6 +223,9 @@ Reducing Channel Access Delay for RTA Traffic, document IEEE 802.11-
 
 
 ### Run
+#### 권장 설정 처리량
+* VI가 VO 보다 암묵적 우선순위가 높게하는 처리량 값이 있는데,, 변수가 너무 많아서 일단 해보는데까지 해보기
+  
 #### wifi model 일부 수정 부분
 ```
 ns3::WifiMac
