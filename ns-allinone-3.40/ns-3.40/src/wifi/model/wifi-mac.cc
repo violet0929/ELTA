@@ -154,9 +154,6 @@ WifiMac::GetTypeId()
                 "(capped to 65535 for HT PPDUs, 1048575 for VHT PPDUs, 6500631 for HE PPDUs "
                 "and 15523200 for EHT PPDUs). "
                 "Value 0 means A-MPDU aggregation is disabled for that AC.",
-                /* violet */
-                // UintegerValue(0),
-                /* violet */
                 UintegerValue(65535),
                 MakeUintegerAccessor(&WifiMac::m_voMaxAmpduSize),
                 MakeUintegerChecker<uint32_t>(0, 15523200))
@@ -184,7 +181,7 @@ WifiMac::GetTypeId()
                 "(capped to 65535 for HT PPDUs, 1048575 for VHT PPDUs, 6500631 for HE PPDUs "
                 "and 15523200 for EHT PPDUs). "
                 "Value 0 means A-MPDU aggregation is disabled for that AC.",
-                UintegerValue(0),
+                UintegerValue(65535),
                 MakeUintegerAccessor(&WifiMac::m_bkMaxAmpduSize),
                 MakeUintegerChecker<uint32_t>(0, 15523200))
             .AddAttribute(

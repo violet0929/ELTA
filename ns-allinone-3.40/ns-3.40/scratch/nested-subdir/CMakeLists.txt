@@ -2,7 +2,7 @@
 add_library(
   scratch-nested-subdir-lib
   lib/scratch-nested-subdir-library-source.cc
-        ../simulator_temp2.cc
+        ../ELTA-simulator.cc
 )
 
 # Link the custom library to the scratch executable

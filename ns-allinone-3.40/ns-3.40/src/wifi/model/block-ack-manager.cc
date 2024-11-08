@@ -686,6 +686,7 @@ BlockAckManager::ScheduleBar(const CtrlBAckRequestHeader& reqHdr, const WifiMacH
             }
         }
     }
+
     m_queue->Enqueue(Create<WifiMpdu>(pkt, hdr));
 }
 

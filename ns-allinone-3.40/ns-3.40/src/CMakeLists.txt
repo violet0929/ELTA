@@ -72,6 +72,10 @@ if(${NS3_MONOLIB})
   add_library(
     ${lib-ns3-monolib} SHARED ${PROJECT_SOURCE_DIR}/build-support/empty.cc
                               "${lib-ns3-static-objs}"
+          wifi/model/elta/elta-tracer.cc
+          wifi/model/elta/elta-tracer.h
+          wifi/model/elta/elta-handler.cc
+          wifi/model/elta/elta-handler.h
   )
   set_target_properties(
     ${lib-ns3-monolib}

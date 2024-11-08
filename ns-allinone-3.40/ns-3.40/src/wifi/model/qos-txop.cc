@@ -497,7 +497,6 @@ QosTxop::GetNextMpdu(uint8_t linkId,
         (initialFrame && txParams.GetSize(recipient) == 0 ? Time::Min() : availableTime);
 
     auto qosFem = StaticCast<QosFrameExchangeManager>(m_mac->GetFrameExchangeManager(linkId));
-
     if (!qosFem->TryAddMpdu(peekedItem, txParams, actualAvailableTime))
     {
         return nullptr;

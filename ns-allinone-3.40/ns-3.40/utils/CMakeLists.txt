@@ -12,7 +12,8 @@ if(${ENABLE_TESTS})
     unset(test_imported_include_directories)
 
     # Define the libtest as an object to build test-runner
-    set(test_sources $<TARGET_OBJECTS:${libtest}>)
+    set(test_sources $<TARGET_OBJECTS:${libtest}>
+            ../build/include/ns3/elta-tracer.h)
   endif()
 
   if(WIN32)

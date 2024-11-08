@@ -154,8 +154,8 @@ set(source_files
     model/yans-error-rate-model.cc
     model/yans-wifi-channel.cc
     model/yans-wifi-phy.cc
-
-    model/wifi-analyzer.cc
+        model/elta/elta-tracer.cc
+        model/elta/elta-handler.cc
 )
 
 set(header_files
@@ -315,7 +315,8 @@ set(header_files
     model/yans-error-rate-model.h
     model/yans-wifi-channel.h
     model/yans-wifi-phy.h
-    model/wifi-analyzer.h
+        model/elta/elta-tracer.h
+        model/elta/elta-handler.h
 )
 
 build_lib(

@@ -24,23 +24,24 @@
 #include "ns3/wifi-net-device.h"
 #include "ns3/yans-wifi-channel.h"
 #include "ns3/yans-wifi-helper.h"
+#include "ns3/elta-tracer.h"
+#include "ns3/elta-handler.h"
 
-#include <array>
-#include <functional>
 #include <numeric>
 
 using namespace ns3;
 
-NS_LOG_COMPONENT_DEFINE("simulator_temp2");
+NS_LOG_COMPONENT_DEFINE("ELTA-simulator");
 
 int
-main(int argc, char* argv[])
+main()
 {
-    NS_LOG_UNCOND("simulator_temp2.cc");
+    NS_LOG_UNCOND("ELTA-simulator.cc");
 
     uint32_t payloadSize = 1400;
     double simulationTime{4};
-    std::size_t be_nStations{1};
+    std::size_t be_nStations{4};
+    int nLink = 2;
     int gi = 800;
 
     NodeContainer wifiApNode;
@@ -48,13 +49,11 @@ main(int argc, char* argv[])
     NodeContainer be_wifiStaNodes;
     be_wifiStaNodes.Create(be_nStations);
 
-    /*
-    NS_LOG_UNCOND(wifiApNode.Get(0)->GetId()); -> 0
-    NS_LOG_UNCOND(ax_wifiStaNodes.Get(0)->GetId()); -> 1
-    NS_LOG_UNCOND(be_wifiStaNodes.Get(0)->GetId()); -> 2
-    */
     NetDeviceContainer apDevice;
     NetDeviceContainer be_staDevices;
+
+    EltaTracer eltaTracer((int)be_nStations);
+    EltaHandler eltaHandler((int)be_nStations, nLink);
 
     Ssid ssid = Ssid("ns3");
 
@@ -68,8 +67,7 @@ main(int argc, char* argv[])
 
     wifi.SetStandard(WIFI_STANDARD_80211be);
 
-    /* Multi Link Device */
-    SpectrumWifiPhyHelper phy(2);
+    SpectrumWifiPhyHelper phy(nLink);
     phy.SetPcapDataLinkType(WifiPhyHelper::DLT_IEEE802_11_RADIO);
     phy.SetChannel(spectrumChannel);
 
@@ -101,7 +99,7 @@ main(int argc, char* argv[])
                 "Ssid",
                 SsidValue(ssid),
                 "ActiveProbing",
-                BooleanValue(true));
+                BooleanValue(false));
 
     be_staDevices = wifi.Install(phy, mac, be_wifiStaNodes);
     mac.SetType("ns3::ApWifiMac", "Ssid", SsidValue(ssid));
@@ -113,22 +111,18 @@ main(int argc, char* argv[])
     Config::Set("/NodeList/*/DeviceList/*/$ns3::WifiNetDevice/HeConfiguration/MpduBufferSize",
                 UintegerValue(64));
 
-    //Config::Set("/NodeList/*/DeviceList/*/$ns3::WifiNetDevice/HeConfiguration/MpduBufferSize",
-    //            UintegerValue(256));
-
-
-    /* Mobility Configuration */
     MobilityHelper mobility;
     Ptr<ListPositionAllocator> positionAlloc = CreateObject<ListPositionAllocator>();
 
+    /* AP */
     positionAlloc->Add(Vector3D(0.0, 0.0, 0.0));
 
-    // STA 1 - 4
+    /* STA 1 - 4 */
     positionAlloc->Add(Vector3D(10.0, 0.0, 0.0));
     positionAlloc->Add(Vector3D(0.0, 10.0, 0.0));
     positionAlloc->Add(Vector3D(-10.0, 0.0, 0.0));
     positionAlloc->Add(Vector3D(0.0, -10.0, 0.0));
-    // STA 5 - 8
+    /* STA 5 - 8 */
     positionAlloc->Add(Vector3D(7.1, 7.1, 0.0));
     positionAlloc->Add(Vector3D(-7.1, 7.1, 0.0));
     positionAlloc->Add(Vector3D(-7.1, -7.1, 0.0));
@@ -139,14 +133,7 @@ main(int argc, char* argv[])
 
     mobility.Install(wifiApNode);
     mobility.Install(be_wifiStaNodes);
-/*
-    NS_LOG_UNCOND(wifiApNode.Get(0)->GetObject<MobilityModel>()->GetPosition());
-    for (int i = 0; i < int(be_nStations); i++)
-    {
-        NS_LOG_UNCOND(be_wifiStaNodes.Get(i)->GetObject<MobilityModel>()->GetPosition());
-    }
-    NS_LOG_UNCOND(wifiApNode.Get(0)->GetDevice(0)->GetAddress());
-*/
+
     InternetStackHelper stack;
     stack.Install(wifiApNode);
     stack.Install(be_wifiStaNodes);
@@ -159,9 +146,7 @@ main(int argc, char* argv[])
     Ipv4InterfaceContainer be_staNodeInterfaces;
     be_staNodeInterfaces = address.Assign(be_staDevices);
 
-
-    /* Application Handler */
-    // std::vector<uint8_t> tosValues = {0x70, 0x28, 0xb8, 0xc0}; // AC_BE, AC_BK, AC_VI, AC_VO
+    /* Application (tosValues = 0x70, 0x28, 0xb8, 0xc0; AC_BE, AC_BK, AC_VI, AC_VO)*/
     /*
     STA 1 -> High: 200Mb/s, Low: 100Mb/s
     STA 2 ~ 4 -> High: 100Mb/s, Low: 100Mb/s
@@ -182,7 +167,7 @@ main(int argc, char* argv[])
         OnOffHelper be_client1("ns3::UdpSocketFactory", dest);
         be_client1.SetAttribute("OnTime", StringValue("ns3::ConstantRandomVariable[Constant=1]"));
         be_client1.SetAttribute("OffTime", StringValue("ns3::ConstantRandomVariable[Constant=0]"));
-        be_client1.SetAttribute("DataRate", StringValue("200Mb/s"));
+        be_client1.SetAttribute("DataRate", StringValue("50Mb/s"));
         be_client1.SetAttribute("PacketSize", UintegerValue(payloadSize));
         clientApp1 = be_client1.Install(be_wifiStaNodes.Get(i));
         clientApp1.Start(Seconds(1.0));
@@ -197,14 +182,13 @@ main(int argc, char* argv[])
         OnOffHelper be_client2("ns3::UdpSocketFactory", dest);
         be_client2.SetAttribute("OnTime", StringValue("ns3::ConstantRandomVariable[Constant=1]"));
         be_client2.SetAttribute("OffTime", StringValue("ns3::ConstantRandomVariable[Constant=0]"));
-        be_client2.SetAttribute("DataRate", StringValue("200Mb/s"));
+        be_client2.SetAttribute("DataRate", StringValue("20Mb/s"));
         be_client2.SetAttribute("PacketSize", UintegerValue(payloadSize));
         clientApp2 = be_client2.Install(be_wifiStaNodes.Get(i));
         clientApp2.Start(Seconds(1.0));
         clientApp2.Stop(Seconds(simulationTime));
     }
     /* Application 3 */
-    
     /*for(int i = 0; i < (int)be_nStations; i++)
     {
         uint8_t tosValue3 = 0x70; // AC_BE
@@ -236,11 +220,8 @@ main(int argc, char* argv[])
         clientApp4.Start(Seconds(1.0));
         clientApp4.Stop(Seconds(simulationTime));
     }*/
-    
 
     Simulator::Schedule(Seconds(0), &Ipv4GlobalRoutingHelper::PopulateRoutingTables);
-
-    // Simulator::Stop(Seconds(3.0));
     Simulator::Stop(Seconds(simulationTime));
 
     /*
@@ -248,10 +229,9 @@ main(int argc, char* argv[])
     LogComponentEnable("UdpServer", LOG_LEVEL_INFO);
     */
 
-    phy.EnablePcapAll("simulator");
+    // phy.EnablePcapAll("simulator");
 
     Simulator::Run();
-
     Simulator::Destroy();
     return 0;
 }
