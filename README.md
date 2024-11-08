@@ -223,10 +223,31 @@ Reducing Channel Access Delay for RTA Traffic, document IEEE 802.11-
 
 
 ### Run
-수정 부분 아오 좀 그만 까먹어라
-ns3::WifiMac (151-186)
-ns3::WifiMac::ConfigureDcf (688-723)
+wifi model 일부 수정 부분
+ns3::WifiMac
+ns3::WifiMac::ConfigureDcf
+ns3::HtFrameExchangeManager::StartFrameExchange
+ns3::HtFrameExchangeManager::BlockAckTimeout
+ns3::HtFrameExchangeManager::ForwardPsduDown
+ns3::FrameExchangeManager::Receive
 
+
+#### 추가 부분
+```
+./ns-3.40/scratch/ELTA-simulator.cc
+```
+
+```
+./ns-3.40/src/wifi/model/elta/elta-handler.h'
+./ns-3.40/src/wifi/model/elta/elta-handler.cc'
+```
+
+```
+./ns-3.40/src/wifi/model/elta/elta-tracer.h'
+./ns-3.40/src/wifi/model/elta/elta-tracer.cc'
+```
+
+#### 시뮬레이터 실행
 ```
 ./ns3 run ELTA-simulator
 ```
